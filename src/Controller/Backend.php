@@ -298,6 +298,9 @@ class Backend implements ControllerProviderInterface
         foreach ($request->request->get('members') as $guid) {
             try {
                 $app['members.admin']->enableAccount($guid);
+                $account = $app['members.records']->getAccountByGuid($guid);
+                $event = new MembersProfileEvent($account);
+                $app['dispatcher']->dispatch(MembersEvents::MEMBER_ENABLE, $event);
             } catch (\Exception $e) {
                 return new JsonResponse($this->getResult('userEnable', $e), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
@@ -319,6 +322,9 @@ class Backend implements ControllerProviderInterface
         foreach ($request->request->get('members') as $guid) {
             try {
                 $app['members.admin']->disableAccount($guid);
+                $account = $app['members.records']->getAccountByGuid($guid);
+                $event = new MembersProfileEvent($account);
+                $app['dispatcher']->dispatch(MembersEvents::MEMBER_DISABLE, $event);
             } catch (\Exception $e) {
                 return new JsonResponse($this->getResult('userEnable', $e), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
